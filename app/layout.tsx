@@ -13,21 +13,24 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://marmitinha-delivery-cardapio.gamesflaxaropinho.chatgpt.site"),
   title: "Marmitinha Delivery | Cardápio digital",
   description: "Cuscuz, tapioca e bebidas. Monte seu pedido e envie pelo WhatsApp.",
   openGraph: {
     title: "Marmitinha Delivery",
     description: "Cuscuz, tapioca e bebidas. Monte seu pedido e envie pelo WhatsApp.",
     type: "website",
+    images: [{ url: "/og.png", width: 1200, height: 630, alt: "Marmitinha Delivery — feito com carinho, entregue com amor" }],
   },
   twitter: {
     card: "summary_large_image",
     title: "Marmitinha Delivery",
     description: "Cuscuz, tapioca e bebidas. Monte seu pedido e envie pelo WhatsApp.",
+    images: ["/og.png"],
   },
   icons: {
-    icon: "/favicon.svg",
-    shortcut: "/favicon.svg",
+    icon: "/logo-marmitinha.png",
+    shortcut: "/logo-marmitinha.png",
   },
 };
 
