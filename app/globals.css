@@ -224,3 +224,17 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
   .hero-notes{display:none}.cordel-sun{right:-260px;bottom:-180px}
 }
 @media(max-width:380px){.hero-layout h1{font-size:42px}.hero-visual img{height:205px}}
+
+/* Ajustes compactos do cardápio no celular */
+@media(max-width:620px){
+  .menu-shell{padding-bottom:190px}
+  .product-card{height:205px;min-height:205px}
+  .product-photo{height:205px;min-height:205px}
+  .product-info button{width:38px;height:38px;min-height:38px}
+  .product-info button span{width:20px;height:20px;font-size:16px}
+  .product-guarana-250 .product-photo img{transform:scale(.76)}
+  .product-guarana-250:hover .product-photo img{transform:scale(.79)}
+  .cart-dock{bottom:8px;min-height:62px;width:calc(100% - 24px);padding:8px 9px;border-radius:15px}
+  .cart-dock>b{padding:11px 12px;font-size:14px}
+}
+@media(max-width:360px){.product-card,.product-photo{height:198px;min-height:198px}}
