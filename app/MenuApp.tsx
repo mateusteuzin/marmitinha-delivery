@@ -28,7 +28,7 @@ const products: Product[] = [
   { id:"coca-250", name:"Coca-Cola Zero 250 ml", category:"Bebidas", price:3, description:"Garrafinha gelada, sem açúcar.", image:"/coca-zero-250.png", fit:"contain", badge:"Gelada" },
   { id:"guarana-250", name:"Guaraná 250 ml", category:"Bebidas", price:3, description:"Guaraná gelado para acompanhar seu pedido.", image:"/guarana-250.png", fit:"contain", badge:"Gelado" },
   { id:"coca-lata", name:"Coca-Cola Zero lata", category:"Bebidas", price:5, description:"Lata gelada, sem açúcar.", image:"/coca-zero-lata.png", fit:"contain", badge:"Gelada" },
-  { id:"sucos", name:"Sucos", category:"Bebidas", price:6, description:"Consulte os sabores disponíveis no WhatsApp.", image:"/suco.svg", fit:"contain", badge:"Sabores do dia" },
+  { id:"sucos", name:"Sucos", category:"Bebidas", price:6, description:"Consulte os sabores disponíveis no WhatsApp.", image:"/suco.png", fit:"contain", badge:"Sabores do dia" },
 ];
 
 const extras: Extra[] = [
