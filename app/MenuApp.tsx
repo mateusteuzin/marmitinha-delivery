@@ -103,11 +103,17 @@ export function MenuApp() {
         <a className="brand" href="#inicio" aria-label="Marmitinha Delivery — início"><img className="brand-logo" src="/logo-marmitinha.png" alt="Marmitinha Delivery"/></a>
         <a className="open-pill" href="#cardapio"><i/> Aceitando pedidos <span>Ver cardápio</span></a>
       </nav>
-      <div className="hero-copy">
-        <p className="eyebrow">Sabor nordestino • feito na hora</p>
-        <h1>Comida que abraça.<br/><em>Pedido sem complicação.</em></h1>
-        <p>Cuscuz quentinho, tapioca bem recheada e aquele capricho que faz você pedir de novo.</p>
-        <a className="hero-cta" href="#cardapio">Montar meu pedido <span>↓</span></a>
+      <div className="hero-layout">
+        <div className="hero-copy">
+          <p className="eyebrow">Cardápio digital • Marmitinha Delivery</p>
+          <h1>Cuscuz, tapioca<br/><em>& bebidas.</em></h1>
+          <p>Escolha seu favorito, adicione os extras e mande o pedido direto para o WhatsApp.</p>
+          <a className="hero-cta" href="#cardapio">Ver o cardápio <span>↓</span></a>
+        </div>
+        <div className="hero-visual" aria-label="Destaque do cardápio">
+          <img src="/cuscuz-amostrado.jpg" alt="Cuscuz completo da Marmitinha"/>
+          <span><b>Feito na hora</b><small>Comida nordestina de verdade</small></span>
+        </div>
       </div>
       <div className="hero-notes" aria-label="Diferenciais"><span><b>01</b> Feito na hora</span><span><b>02</b> Do seu jeito</span><span><b>03</b> Direto no WhatsApp</span></div>
     </header>
