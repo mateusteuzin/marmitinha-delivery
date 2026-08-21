@@ -51,27 +51,6 @@ function ArrowIcon() {
   return <svg width="18" height="18" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M4 10h11m-4-4 4 4-4 4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg>;
 }
 
-function NordestinoPattern({ className = "" }: { className?: string }) {
-  return <svg className={className} viewBox="0 0 1200 620" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
-    <g className="pattern-stroke">
-      <path d="M82 508v-92m0 34c-24 0-30-17-30-37m30 67c25 0 34-17 34-39M67 508h30"/>
-      <path d="M1050 102v-62m0 24c-17 0-22-12-22-26m22 47c18 0 24-12 24-27m-34 44h21"/>
-      <circle cx="1090" cy="465" r="35"/><path d="M1090 412v-20m0 146v-20m53-53h20m-146 0h20m91-38 14-14m-103 103 14-14m75 14 14 14m-103-103 14 14"/>
-      <path d="M174 106c28-28 57-28 85 0-28 8-57 8-85 0Zm42-40v31m-17-21 17 21 18-21"/>
-      <path d="M860 535c20-28 52-30 76-8-19 26-51 29-76 8Zm13 4c17-4 32-7 50-10m-28-8 1 14m15-21 2 18"/>
-      <path d="m470 74 8 18 20 2-15 13 5 20-18-10-18 10 5-20-15-13 20-2 8-18Z"/>
-      <path d="M742 146c0-20 16-36 36-36s36 16 36 36m-72 0h72m-61 0c3 20 13 31 25 31s22-11 25-31"/>
-      <path d="M273 452c17-17 35-17 52 0-17 5-35 5-52 0Zm26-25v19"/>
-      <path d="M0 210c102 16 172 14 256-8s173-19 258 4 176 24 270 3 198-25 416-2"/>
-    </g>
-    <g className="pattern-fill">
-      <path d="m334 177 5 12 13 1-10 8 3 13-11-7-12 7 4-13-10-8 13-1 5-12Z"/>
-      <path d="m995 298 4 10 11 1-9 7 3 11-9-6-10 6 3-11-8-7 11-1 4-10Z"/>
-      <circle cx="575" cy="520" r="6"/><circle cx="623" cy="111" r="4"/><circle cx="142" cy="298" r="5"/>
-    </g>
-  </svg>;
-}
-
 export function MenuApp() {
   const [category,setCategory] = useState<Category>("Cuscuz");
   const [selected,setSelected] = useState<Product|null>(null);
@@ -127,29 +106,18 @@ export function MenuApp() {
 
   return <main>
     <header className="hero" id="inicio">
-      <NordestinoPattern className="hero-pattern"/>
-      <nav className="topbar" aria-label="Navegação principal">
-        <a className="brand" href="#inicio" aria-label="Marmitinha Delivery — início"><span className="brand-plate"><img className="brand-logo" src="/logo-marmitinha-transparent.png" alt="Marmitinha Delivery"/></span></a>
-        <div className="header-actions"><span className="open-pill"><i/> <span className="open-copy"><b>Estamos abertos</b><small>Pedidos pelo WhatsApp</small></span></span><a className="header-whatsapp" href="https://wa.me/558897309179" target="_blank" rel="noreferrer" aria-label="Falar com a Marmitinha no WhatsApp"><WhatsAppIcon size={19}/><span>Falar agora</span></a></div>
-      </nav>
-      <div className="hero-layout">
-        <div className="hero-copy">
-          <p className="eyebrow">Cardápio online • sabor nordestino</p>
-          <h1>Comida feita<br/><em>com carinho.</em></h1>
-          <p>Cuscuz, tapioca e bebidas preparados do seu jeito. Escolha, personalize e finalize direto pelo WhatsApp.</p>
-          <div className="hero-actions"><a className="hero-cta" href="#cardapio">Explorar cardápio <ArrowIcon/></a><span className="hero-microcopy">Entrega e retirada<br/><b>Peça em poucos passos</b></span></div>
-        </div>
-        <div className="hero-visual" aria-label="Destaque do cardápio">
-          <img src="/cuscuz-amostrado.jpg" alt="Cuscuz completo da Marmitinha"/>
-          <span className="hero-tag"><small>O queridinho da casa</small><b>Cuscuz Amostrado</b><em>{money(15)}</em></span>
-          <span className="hero-stamp">Feito<br/>na hora</span>
-        </div>
+      <div className="restaurant-cover"><img src="/cuscuz-hero.jpg" alt="Cuscuz da Marmitinha Delivery"/><span className="open-badge"><i/> Aberto</span></div>
+      <div className="restaurant-profile">
+        <div className="profile-logo"><img src="/logo-marmitinha-transparent.png" alt="Logo Marmitinha Delivery"/></div>
+        <p className="profile-kicker">Cardápio digital</p>
+        <h1>Marmitinha Delivery</h1>
+        <p className="profile-tagline">Feito com carinho, entregue com amor.</p>
+        <div className="profile-info"><span><b>Entrega e retirada</b><small>Escolha como receber</small></span><span><b>Pedido pelo WhatsApp</b><small>(88) 9730-9179</small></span></div>
+        <a className="profile-cta" href="#cardapio">Ver cardápio <ArrowIcon/></a>
       </div>
-      <div className="hero-notes" aria-label="Diferenciais"><span><b>01</b> Ingredientes frescos</span><span><b>02</b> Personalize seu pedido</span><span><b>03</b> Finalize no WhatsApp</span></div>
     </header>
 
     <section className="menu-shell" id="cardapio">
-      <NordestinoPattern className="menu-pattern"/>
       <div className="section-heading"><div><p className="eyebrow">Da nossa cozinha para você</p><h2>Escolha seu favorito</h2></div><div className="menu-guide"><span>18 opções</span><p>Toque em um item para ver detalhes e adicionais.</p></div></div>
       <div className="category-tabs" aria-label="Categorias">{categories.map(cat=><button className={category===cat?"active":""} key={cat} onClick={()=>setCategory(cat)} aria-pressed={category===cat}>{cat}<span>{products.filter(p=>p.category===cat).length}</span></button>)}</div>
       <div className="category-intro"><p><strong>{category}</strong> • {category === "Bebidas" ? "Para acompanhar, sempre bem geladas." : "Escolha o seu e acrescente extras se quiser."}</p></div>
