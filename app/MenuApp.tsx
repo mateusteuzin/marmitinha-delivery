@@ -100,7 +100,7 @@ export function MenuApp() {
     <header className="hero" id="inicio">
       <div className="cordel-sun" aria-hidden="true"/>
       <nav className="topbar" aria-label="Navegação principal">
-        <a className="brand" href="#inicio" aria-label="Marmitinha Delivery — início"><img className="brand-logo" src="/logo-marmitinha.png" alt="Marmitinha Delivery"/></a>
+        <a className="brand" href="#inicio" aria-label="Marmitinha Delivery — início"><img className="brand-logo" src="/logo-marmitinha-transparent.png" alt="Marmitinha Delivery"/></a>
         <a className="open-pill" href="#cardapio"><i/> Aceitando pedidos <span>Ver cardápio</span></a>
       </nav>
       <div className="hero-layout">
@@ -130,7 +130,7 @@ export function MenuApp() {
       </div>
     </section>
 
-    <footer className="site-footer"><div><img src="/logo-marmitinha.png" alt="Marmitinha Delivery"/><div><strong>Feito com carinho,<br/>entregue com amor.</strong><p>Pedidos pelo WhatsApp: (88) 9730-9179</p></div></div><a href="#inicio">Voltar ao topo ↑</a></footer>
+    <footer className="site-footer"><div><img src="/logo-marmitinha-transparent.png" alt="Marmitinha Delivery"/><div><strong>Feito com carinho,<br/>entregue com amor.</strong><p>Pedidos pelo WhatsApp: (88) 9730-9179</p></div></div><a href="#inicio">Voltar ao topo ↑</a></footer>
 
     <button className={`cart-dock ${itemCount ? "has-items" : ""}`} onClick={()=>setCartOpen(true)} aria-label={`Abrir pedido com ${itemCount} itens`}><span className="cart-symbol">⌑</span><div><span>Seu pedido</span><strong>{itemCount?`${itemCount} ${itemCount===1?"item":"itens"} · ${money(subtotal)}`:"Escolha seu primeiro item"}</strong></div><b>Ver pedido <span>{itemCount}</span></b></button>
     <div className={`add-toast ${addedProduct ? "show" : ""}`} role="status"><span>✓</span><div><strong>Adicionado ao pedido</strong><small>{addedProduct}</small></div></div>
