@@ -29,8 +29,9 @@ export const metadata: Metadata = {
     images: ["/og.png"],
   },
   icons: {
-    icon: "/logo-marmitinha.png",
-    shortcut: "/logo-marmitinha.png",
+    icon: [{ url: "/favicon-cuscuz.png", type: "image/png", sizes: "512x512" }],
+    shortcut: "/favicon-cuscuz.png",
+    apple: "/favicon-cuscuz.png",
   },
 };
 
