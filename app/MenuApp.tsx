@@ -43,6 +43,35 @@ function WhatsAppIcon({ size = 22 }: { size?: number }) {
   return <svg className="whatsapp-icon" width={size} height={size} viewBox="0 0 24 24" aria-hidden="true"><path d={siWhatsapp.path}/></svg>;
 }
 
+function BagIcon({ size = 22 }: { size?: number }) {
+  return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6.7 8.5h10.6l1 11H5.7l1-11Z" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round"/><path d="M9 9V6.8a3 3 0 0 1 6 0V9" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/></svg>;
+}
+
+function ArrowIcon() {
+  return <svg width="18" height="18" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M4 10h11m-4-4 4 4-4 4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg>;
+}
+
+function NordestinoPattern({ className = "" }: { className?: string }) {
+  return <svg className={className} viewBox="0 0 1200 620" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+    <g className="pattern-stroke">
+      <path d="M82 508v-92m0 34c-24 0-30-17-30-37m30 67c25 0 34-17 34-39M67 508h30"/>
+      <path d="M1050 102v-62m0 24c-17 0-22-12-22-26m22 47c18 0 24-12 24-27m-34 44h21"/>
+      <circle cx="1090" cy="465" r="35"/><path d="M1090 412v-20m0 146v-20m53-53h20m-146 0h20m91-38 14-14m-103 103 14-14m75 14 14 14m-103-103 14 14"/>
+      <path d="M174 106c28-28 57-28 85 0-28 8-57 8-85 0Zm42-40v31m-17-21 17 21 18-21"/>
+      <path d="M860 535c20-28 52-30 76-8-19 26-51 29-76 8Zm13 4c17-4 32-7 50-10m-28-8 1 14m15-21 2 18"/>
+      <path d="m470 74 8 18 20 2-15 13 5 20-18-10-18 10 5-20-15-13 20-2 8-18Z"/>
+      <path d="M742 146c0-20 16-36 36-36s36 16 36 36m-72 0h72m-61 0c3 20 13 31 25 31s22-11 25-31"/>
+      <path d="M273 452c17-17 35-17 52 0-17 5-35 5-52 0Zm26-25v19"/>
+      <path d="M0 210c102 16 172 14 256-8s173-19 258 4 176 24 270 3 198-25 416-2"/>
+    </g>
+    <g className="pattern-fill">
+      <path d="m334 177 5 12 13 1-10 8 3 13-11-7-12 7 4-13-10-8 13-1 5-12Z"/>
+      <path d="m995 298 4 10 11 1-9 7 3 11-9-6-10 6 3-11-8-7 11-1 4-10Z"/>
+      <circle cx="575" cy="520" r="6"/><circle cx="623" cy="111" r="4"/><circle cx="142" cy="298" r="5"/>
+    </g>
+  </svg>;
+}
+
 export function MenuApp() {
   const [category,setCategory] = useState<Category>("Cuscuz");
   const [selected,setSelected] = useState<Product|null>(null);
@@ -98,41 +127,43 @@ export function MenuApp() {
 
   return <main>
     <header className="hero" id="inicio">
-      <div className="cordel-sun" aria-hidden="true"/>
+      <NordestinoPattern className="hero-pattern"/>
       <nav className="topbar" aria-label="Navegação principal">
-        <a className="brand" href="#inicio" aria-label="Marmitinha Delivery — início"><img className="brand-logo" src="/logo-marmitinha-transparent.png" alt="Marmitinha Delivery"/></a>
-        <a className="open-pill" href="#cardapio"><i/> Aceitando pedidos <span>Ver cardápio</span></a>
+        <a className="brand" href="#inicio" aria-label="Marmitinha Delivery — início"><span className="brand-plate"><img className="brand-logo" src="/logo-marmitinha-transparent.png" alt="Marmitinha Delivery"/></span></a>
+        <div className="header-actions"><span className="open-pill"><i/> <span className="open-copy"><b>Estamos abertos</b><small>Pedidos pelo WhatsApp</small></span></span><a className="header-whatsapp" href="https://wa.me/558897309179" target="_blank" rel="noreferrer" aria-label="Falar com a Marmitinha no WhatsApp"><WhatsAppIcon size={19}/><span>Falar agora</span></a></div>
       </nav>
       <div className="hero-layout">
         <div className="hero-copy">
-          <p className="eyebrow">Cardápio digital • Marmitinha Delivery</p>
-          <h1>Cuscuz, tapioca<br/><em>& bebidas.</em></h1>
-          <p>Escolha seu favorito, adicione os extras e mande o pedido direto para o WhatsApp.</p>
-          <a className="hero-cta" href="#cardapio">Ver o cardápio <span>↓</span></a>
+          <p className="eyebrow">Cardápio online • sabor nordestino</p>
+          <h1>Comida feita<br/><em>com carinho.</em></h1>
+          <p>Cuscuz, tapioca e bebidas preparados do seu jeito. Escolha, personalize e finalize direto pelo WhatsApp.</p>
+          <div className="hero-actions"><a className="hero-cta" href="#cardapio">Explorar cardápio <ArrowIcon/></a><span className="hero-microcopy">Entrega e retirada<br/><b>Peça em poucos passos</b></span></div>
         </div>
         <div className="hero-visual" aria-label="Destaque do cardápio">
           <img src="/cuscuz-amostrado.jpg" alt="Cuscuz completo da Marmitinha"/>
-          <span><b>Feito na hora</b><small>Comida nordestina de verdade</small></span>
+          <span className="hero-tag"><small>O queridinho da casa</small><b>Cuscuz Amostrado</b><em>{money(15)}</em></span>
+          <span className="hero-stamp">Feito<br/>na hora</span>
         </div>
       </div>
-      <div className="hero-notes" aria-label="Diferenciais"><span><b>01</b> Feito na hora</span><span><b>02</b> Do seu jeito</span><span><b>03</b> Direto no WhatsApp</span></div>
+      <div className="hero-notes" aria-label="Diferenciais"><span><b>01</b> Ingredientes frescos</span><span><b>02</b> Personalize seu pedido</span><span><b>03</b> Finalize no WhatsApp</span></div>
     </header>
 
     <section className="menu-shell" id="cardapio">
-      <div className="section-heading"><div><p className="eyebrow">Da nossa cozinha para você</p><h2>Nosso cardápio</h2></div><p>Escolha um item, personalize e envie. Simples assim.</p></div>
+      <NordestinoPattern className="menu-pattern"/>
+      <div className="section-heading"><div><p className="eyebrow">Da nossa cozinha para você</p><h2>Escolha seu favorito</h2></div><div className="menu-guide"><span>18 opções</span><p>Toque em um item para ver detalhes e adicionais.</p></div></div>
       <div className="category-tabs" aria-label="Categorias">{categories.map(cat=><button className={category===cat?"active":""} key={cat} onClick={()=>setCategory(cat)} aria-pressed={category===cat}>{cat}<span>{products.filter(p=>p.category===cat).length}</span></button>)}</div>
       <div className="category-intro"><p><strong>{category}</strong> • {category === "Bebidas" ? "Para acompanhar, sempre bem geladas." : "Escolha o seu e acrescente extras se quiser."}</p></div>
       <div className="menu-grid" key={category} aria-live="polite">
-        {visible.map((item,index)=><article className={`product-card product-${item.id} ${item.fit === "contain" ? "drink-card" : ""}`} key={item.id} onClick={()=>choose(item)} style={{"--delay":`${index*45}ms`} as CSSProperties}>
-          <div className="product-photo"><img src={item.image} alt={item.category==="Bebidas"?item.name:`${item.name} da Marmitinha`} style={{objectPosition:item.focus || "center",objectFit:item.fit || "cover"}}/><span className="photo-shine"/></div>
-          <div className="product-info"><p className="product-kind">{item.badge || "Feito na hora"}</p><h3>{item.name}</h3><p>{item.description}</p><div><span className="price-block"><small>A partir de</small><strong>{money(item.price)}</strong></span><button type="button" onClick={event=>{event.stopPropagation();choose(item)}} aria-label={`${item.customizable?"Escolher opções de":"Adicionar"} ${item.name}`}>{item.customizable?"Escolher":"Adicionar"}<span>+</span></button></div></div>
-        </article>)}
+        {visible.map((item,index)=><button type="button" className={`product-card product-${item.id} ${item.fit === "contain" ? "drink-card" : ""}`} key={item.id} onClick={()=>choose(item)} aria-label={`${item.customizable?"Escolher opções de":"Adicionar"} ${item.name}`} style={{"--delay":`${index*45}ms`} as CSSProperties}>
+          <span className="product-photo"><img src={item.image} alt={item.category==="Bebidas"?item.name:`${item.name} da Marmitinha`} loading="lazy" decoding="async" style={{objectPosition:item.focus || "center",objectFit:item.fit || "cover"}}/><span className="photo-shine"/></span>
+          <span className="product-info"><span className="product-kind">{item.badge || "Feito na hora"}</span><span className="product-title">{item.name}</span><span className="product-description">{item.description}</span><span className="product-bottom"><span className="price-block"><small>A partir de</small><strong>{money(item.price)}</strong></span><span className="product-action"><span className="action-label">{item.customizable?"Personalizar":"Adicionar"}</span><span className="action-icon">+</span></span></span></span>
+        </button>)}
       </div>
     </section>
 
     <footer className="site-footer"><div><img src="/logo-marmitinha-transparent.png" alt="Marmitinha Delivery"/><div><strong>Feito com carinho,<br/>entregue com amor.</strong><p>Pedidos pelo WhatsApp: (88) 9730-9179</p></div></div><a href="#inicio">Voltar ao topo ↑</a></footer>
 
-    <button className={`cart-dock ${itemCount ? "has-items" : ""}`} onClick={()=>setCartOpen(true)} aria-label={`Abrir pedido com ${itemCount} itens`}><span className="cart-symbol">⌑</span><div><span>Seu pedido</span><strong>{itemCount?`${itemCount} ${itemCount===1?"item":"itens"} · ${money(subtotal)}`:"Escolha seu primeiro item"}</strong></div><b>Ver pedido <span>{itemCount}</span></b></button>
+    {itemCount>0&&<button className="cart-dock has-items" onClick={()=>setCartOpen(true)} aria-label={`Abrir pedido com ${itemCount} itens`}><span className="cart-symbol"><BagIcon/></span><span className="cart-copy"><small>Seu pedido está em andamento</small><strong>{itemCount} {itemCount===1?"item":"itens"} · {money(subtotal)}</strong></span><span className="cart-action"><span className="cart-action-label">Revisar pedido</span><span className="cart-count">{itemCount}</span><ArrowIcon/></span></button>}
     <div className={`add-toast ${addedProduct ? "show" : ""}`} role="status"><span>✓</span><div><strong>Adicionado ao pedido</strong><small>{addedProduct}</small></div></div>
 
     {selected&&<div className="overlay" role="presentation" onMouseDown={()=>setSelected(null)}><section className="sheet product-sheet" role="dialog" aria-modal="true" aria-labelledby="product-title" onMouseDown={e=>e.stopPropagation()}><button className="close" onClick={()=>setSelected(null)} aria-label="Fechar">×</button><div className={`sheet-photo-wrap ${selected.fit === "contain" ? "contain" : ""}`}><img className="sheet-photo" src={selected.image} alt="" style={{objectPosition:selected.focus || "center",objectFit:selected.fit || "cover"}}/></div><div className="sheet-body"><p className="eyebrow">{selected.badge || selected.category}</p><h2 id="product-title">{selected.name}</h2><p className="sheet-description">{selected.description}</p><strong className="sheet-price">A partir de {money(selected.price)}</strong>{selected.customizable&&<fieldset className="extras"><legend>Quer acrescentar algo? <small>Opcional</small></legend>{extras.map(extra=><label key={extra.id}><input type="checkbox" checked={selectedExtras.includes(extra.id)} onChange={()=>setSelectedExtras(old=>old.includes(extra.id)?old.filter(id=>id!==extra.id):[...old,extra.id])}/><span>{extra.name}</span><strong>+ {money(extra.price)}</strong></label>)}</fieldset>}<div className="quantity"><span>Quantidade do item</span><div><button onClick={()=>setProductQty(q=>Math.max(1,q-1))} aria-label="Diminuir quantidade">−</button><strong>{productQty}</strong><button onClick={()=>setProductQty(q=>q+1)} aria-label="Aumentar quantidade">+</button></div></div><button className="primary-action" onClick={addSelected}>Adicionar ao pedido <span>{money(currentTotal)}</span></button></div></section></div>}
