@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, type CSSProperties } from "react";
-import { siWhatsapp } from "simple-icons";
+import { siInstagram, siWhatsapp } from "simple-icons";
 
 type Category = "Cuscuz" | "Tapioca" | "Bebidas";
 type Product = {
@@ -41,6 +41,10 @@ const money = (value:number) => value.toLocaleString("pt-BR", { style:"currency"
 
 function WhatsAppIcon({ size = 22 }: { size?: number }) {
   return <svg className="whatsapp-icon" width={size} height={size} viewBox="0 0 24 24" aria-hidden="true"><path d={siWhatsapp.path}/></svg>;
+}
+
+function InstagramIcon({ size = 22 }: { size?: number }) {
+  return <svg className="instagram-icon" width={size} height={size} viewBox="0 0 24 24" aria-hidden="true"><path d={siInstagram.path}/></svg>;
 }
 
 function BagIcon({ size = 22 }: { size?: number }) {
@@ -129,7 +133,7 @@ export function MenuApp() {
       </div>
     </section>
 
-    <footer className="site-footer"><div><img src="/logo-marmitinha-transparent.png" alt="Marmitinha Delivery"/><div><strong>Feito com carinho,<br/>entregue com amor.</strong><p>Pedidos pelo WhatsApp: (88) 9730-9179</p></div></div><a href="#inicio">Voltar ao topo ↑</a></footer>
+    <footer className="site-footer"><div className="footer-inner"><div className="footer-brand"><span className="footer-logo"><img src="/logo-marmitinha-transparent.png" alt="Marmitinha Delivery"/></span><div><strong>Feito com carinho,<br/>entregue com amor.</strong><p>Pedidos pelo WhatsApp: (88) 9730-9179</p></div></div><div className="footer-actions"><a className="instagram-link" href="https://www.instagram.com/marmitinha_1/" target="_blank" rel="noreferrer" aria-label="Abrir Instagram da Marmitinha"><InstagramIcon size={22}/><span><small>Siga a Marmitinha</small><b>@marmitinha_1</b></span></a><a className="back-top" href="#inicio">Voltar ao topo ↑</a></div></div></footer>
 
     {itemCount>0&&<button className="cart-dock has-items" onClick={()=>setCartOpen(true)} aria-label={`Abrir pedido com ${itemCount} itens`}><span className="cart-symbol"><BagIcon/></span><span className="cart-copy"><small>Seu pedido está em andamento</small><strong>{itemCount} {itemCount===1?"item":"itens"} · {money(subtotal)}</strong></span><span className="cart-action"><span className="cart-action-label">Revisar pedido</span><span className="cart-count">{itemCount}</span><ArrowIcon/></span></button>}
     <div className={`add-toast ${addedProduct ? "show" : ""}`} role="status"><span>✓</span><div><strong>Adicionado ao pedido</strong><small>{addedProduct}</small></div></div>
