@@ -118,15 +118,18 @@ export function MenuApp() {
     if (sending) return;
     if (!name.trim() || (orderType === "Entrega" && !address.trim())) { setSendError("Informe seu nome e o endereço para entrega."); return; }
     setSending(true); setSendError("");
-    const popup=window.open("about:blank","_blank");
-    if(popup)popup.opener=null;
+
     orderRequestId.current ||= crypto.randomUUID();
     try {
       const r=await fetch("/api/orders",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({requestId:orderRequestId.current,name,address,payment,notes,type:orderType,items:cart.map(i=>({productId:i.product.id,quantity:i.quantity,extras:i.extras.map(e=>e.id)}))})});
       const b=await r.json();if(!r.ok)throw new Error(b.error||"Não foi possível registrar o pedido.");
-      if(popup)popup.location.href=b.whatsappUrl;else window.location.href=b.whatsappUrl;
+      window.location.assign(b.whatsappUrl);
       setSendError(`Pedido #${b.code} registrado. Envie a mensagem no WhatsApp para confirmar com a Marmitinha.`);
-    }catch(e){popup?.close();setSendError((e as Error).message);}finally{setSending(false);}
+     }catch{
+      const text=["Olá! Quero fazer um pedido (confirmar pelo WhatsApp):",`Nome: ${name}`, ...cart.map(i=>`${i.quantity}x ${i.product.name}${i.extras.length?" ("+i.extras.map(e=>e.name).join(", ")+")":""} — ${money((i.product.price+i.extras.reduce((v,e)=>v+e.price,0))*i.quantity)}`),`Tipo: ${orderType}`,orderType==="Entrega"?`Endereço: ${address}`:"Retirada: Rua Senador Virgílio Távora, 781, Centro, Itarema–CE",`Pagamento: ${payment||"A informar"}`,`Observações: ${notes||"Nenhuma"}`,"Valores e frete a confirmar. Pedido enviado diretamente, sem registro automático no painel."].join("\n");
+      setSendError("Abrindo o WhatsApp para atendimento direto.");
+      window.location.assign(`https://wa.me/558897309179?text=${encodeURIComponent(text)}`);
+    }finally{setSending(false);}
   }
 
   return <main>
