@@ -119,3 +119,5 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 @keyframes extraSelected{50%{transform:translateX(3px)}}
 @media(max-width:620px){.product-action{border-radius:14px;background:#f99a18;box-shadow:0 3px 0 #c97508,0 5px 12px #a849081a}.action-icon{border-radius:14px}.product-card:active .product-action{transform:translateY(2px) scale(.94);box-shadow:0 1px 0 #c97508}}
 @media(prefers-reduced-motion:reduce){.product-card:hover .action-icon{transform:none}}
+
+.pickup-location{margin-top:18px;padding:16px;border:1px solid var(--line);border-radius:14px;background:#fff0d6}.pickup-location>strong{font-size:15px}.pickup-location p{margin:8px 0 12px;font-size:14px;line-height:1.6}.pickup-location a{display:flex;align-items:center;justify-content:center;min-height:48px;padding:10px 12px;border-radius:10px;background:var(--ink);color:#fff;font-size:14px;font-weight:700;text-align:center}.pickup-location a:active{transform:scale(.98)}
