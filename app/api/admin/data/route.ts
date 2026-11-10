@@ -1,13 +1,21 @@
 import { NextRequest,NextResponse } from "next/server";
 import { authorized,sameOrigin } from "../../../../lib/auth";
 import { readState,mutate } from "../../../../lib/store";
+import { randomUUID } from "node:crypto";
+import type { Order } from "../../../../lib/orders";
 import { products } from "../../../../lib/catalog";
 export const runtime="nodejs";
 export async function GET(r:NextRequest){if(!authorized(r))return new Response(null,{status:401});try{return NextResponse.json(await readState(),{headers:{"Cache-Control":"no-store"}});}catch(e){return NextResponse.json({error:(e as Error).message},{status:503});}}
 const price=(v:unknown)=>typeof v==="number"&&Number.isFinite(v)&&v>=0&&v<=10000&&Math.abs(v*100-Math.round(v*100))<.00001;
 export async function PATCH(r:NextRequest){if(!authorized(r))return new Response(null,{status:401});if(!sameOrigin(r))return new Response(null,{status:403});try{
  const b=await r.json();await mutate(s=>{
- if(b.action==="settings"){
+ if(b.action==="manual"){
+  const v=b.sale;
+  if(!v||typeof v.requestId!=="string"||!/^[-a-zA-Z0-9]{20,80}$/.test(v.requestId)||!["pending","completed"].includes(v.status)||!["Entrega","Retirada"].includes(v.type)||!price(v.fee)||!["Pix","Dinheiro","Cartão","A informar"].includes(v.payment)||typeof v.name!=="string"||v.name.length>100||typeof v.address!=="string"||v.address.length>500||(v.type==="Entrega"&&!v.address.trim())||typeof v.notes!=="string"||v.notes.length>1000||!Array.isArray(v.lines)||!v.lines.length||v.lines.length>50)throw new Error("Confira os dados da venda.");
+  if(s.orders.some(o=>o.id===v.requestId))return;
+  const lines=v.lines.map((l:{productId:string;quantity:number;unitPrice:number})=>{const p=products.find(p=>p.id===l.productId);if(!p||!Number.isInteger(l.quantity)||l.quantity<1||l.quantity>99||!price(l.unitPrice))throw new Error("Confira os produtos, quantidades e preços.");return {productId:p.id,name:p.name,quantity:l.quantity,unitPrice:l.unitPrice,extras:[]};});
+  const now=new Date().toISOString();const o:Order={id:v.requestId||randomUUID(),code:String(++s.sequence),createdAt:now,updatedAt:now,status:v.status,name:v.name.trim()||"Venda presencial",address:v.address.trim(),payment:v.payment,notes:"Venda registrada manualmente"+(v.notes.trim()?" · "+v.notes.trim():""),type:v.type,fee:v.type==="Entrega"?v.fee:0,lines,revision:1};s.orders.push(o);
+ }else if(b.action==="settings"){
   if(b.version!==s.version)throw new Error("Os dados mudaram. Atualize antes de salvar.");
   if(!price(b.settings?.defaultFee))throw new Error("Frete inválido.");
   for(const p of products){const v=b.settings.products?.[p.id];if(!v||!price(v.price)||typeof v.available!=="boolean")throw new Error("Confira os preços.");}
