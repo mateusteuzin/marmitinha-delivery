@@ -1,6 +1,6 @@
 import { promises as fs } from "node:fs";
 import path from "node:path";
-import { get,put,BlobPreconditionFailedError } from "@vercel/blob";
+import { get,head,put,BlobPreconditionFailedError } from "@vercel/blob";
 import { products } from "./catalog";
 import type { State } from "./orders";
 const initial = ():State => ({version:0,sequence:1000,orders:[],settings:{defaultFee:0,products:Object.fromEntries(products.map(p=>[p.id,{price:p.price,available:true}]))}});
@@ -8,7 +8,21 @@ const file=path.join(process.cwd(),".local-data","store.json");
 const pathname="admin/state-v1.json";
 function online(){if(process.env.BLOB_READ_WRITE_TOKEN||process.env.BLOB_STORE_ID)return true;if(process.env.VERCEL)throw new Error("Armazenamento privado ainda não conectado.");return false;}
 async function snapshot():Promise<{state:State;etag?:string}>{
- if(online()){const r=await get(pathname,{access:"private",useCache:false});if(!r)return {state:initial()};if(r.statusCode!==200||!r.stream)throw new Error("Não foi possível ler os pedidos.");return {state:JSON.parse(await new Response(r.stream).text()),etag:r.blob.etag};}
+ if(online()){
+  for(let attempt=0;attempt<5;attempt++){
+   const r=await get(pathname,{access:"private",useCache:false,headers:{"Accept-Encoding":"identity"}});
+   if(!r)return {state:initial()};
+   if(r.statusCode!==200||!r.stream)throw new Error("Não foi possível ler os pedidos.");
+   const state:State=JSON.parse(await new Response(r.stream).text());
+   const metadata=await head(pathname);
+   const verify=await get(pathname,{access:"private",useCache:false,headers:{"Accept-Encoding":"identity"}});
+   if(!verify||!verify.stream)continue;
+   const latest:State=JSON.parse(await new Response(verify.stream).text());
+   const after=await head(pathname);
+   if(metadata.etag===after.etag&&state.version===latest.version)return {state:latest,etag:after.etag};
+  }
+  throw new Error("Os pedidos estão sendo atualizados. Tente novamente em instantes.");
+ }
  try{return {state:JSON.parse(await fs.readFile(file,"utf8"))};}catch(e){if((e as NodeJS.ErrnoException).code!=="ENOENT")throw e;return {state:initial()};}
 }
 export async function readState(){return (await snapshot()).state;}
