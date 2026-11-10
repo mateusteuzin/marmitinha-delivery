@@ -7,7 +7,7 @@ export type Extra = { id: string; name: string; price: number };
 export type CartItem = { key: string; product: Product; extras: Extra[]; quantity: number };
 
 export const products: Product[] = [
-  { id:"amostrado", name:"Cuscuz Amostrado", category:"Cuscuz", price:15, description:"Carne de sol, carne moída, calabresa, bacon e ovo.", image:"/cuscuz-amostrado.jpg", customizable:true, badge:"Mais pedido", focus:"center 72%" },
+  { id:"amostrado", name:"Cuscuz Amostrado", category:"Cuscuz", price:15, description:"Carne de sol, carne moída, calabresa e bacon.", image:"/cuscuz-amostrado.jpg", customizable:true, badge:"Mais pedido", focus:"center 72%" },
   { id:"nordestino", name:"Nordestino Cremoso", category:"Cuscuz", price:15, description:"Cuscuz macio, carne de sol e uma camada bem cremosa.", image:"/nordestino-cremoso-2-limpo.png", customizable:true, badge:"Bem cremoso", focus:"center 57%" },
   { id:"carne-sol", name:"Carne de Sol", category:"Cuscuz", price:13, description:"Cuscuz quentinho com carne de sol desfiada e temperada.", image:"/cuscuz-carne-sol.jpg", customizable:true, badge:"Clássico da casa", focus:"center 48%" },
   { id:"carne-moida-ovo", name:"Carne Moída com Ovo", category:"Cuscuz", price:12, description:"Carne moída bem temperada, ovo e cuscuz feito na hora.", image:"/cuscuz-carne-moida-ovo.jpg", customizable:true, focus:"center 60%" },
