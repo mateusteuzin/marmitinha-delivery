@@ -40,3 +40,7 @@ yarn-error.log*
 /work/
 
 .vercel
+
+/.local-data/
+!.env.example
+

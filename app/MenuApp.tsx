@@ -1,43 +1,9 @@
 "use client";
 
-import { useState, useEffect, type CSSProperties } from "react";
+import { useState, useEffect, useRef, type CSSProperties } from "react";
 import { siInstagram, siWhatsapp } from "simple-icons";
 
-type Category = "Cuscuz" | "Tapioca" | "Bebidas";
-type Product = {
-  id: string; name: string; category: Category; price: number; description: string;
-  image: string; customizable?: boolean; badge?: string; focus?: string; fit?: "cover" | "contain";
-};
-type Extra = { id: string; name: string; price: number };
-type CartItem = { key: string; product: Product; extras: Extra[]; quantity: number };
-
-const products: Product[] = [
-  { id:"amostrado", name:"Cuscuz Amostrado", category:"Cuscuz", price:15, description:"Carne de sol, carne moída, calabresa, bacon e ovo.", image:"/cuscuz-amostrado.jpg", customizable:true, badge:"Mais pedido", focus:"center 72%" },
-  { id:"nordestino", name:"Nordestino Cremoso", category:"Cuscuz", price:15, description:"Cuscuz macio, carne de sol e uma camada bem cremosa.", image:"/nordestino-cremoso-2-limpo.png", customizable:true, badge:"Bem cremoso", focus:"center 57%" },
-  { id:"carne-sol", name:"Carne de Sol", category:"Cuscuz", price:13, description:"Cuscuz quentinho com carne de sol desfiada e temperada.", image:"/cuscuz-carne-sol.jpg", customizable:true, badge:"Clássico da casa", focus:"center 48%" },
-  { id:"carne-moida-ovo", name:"Carne Moída com Ovo", category:"Cuscuz", price:12, description:"Carne moída bem temperada, ovo e cuscuz feito na hora.", image:"/cuscuz-carne-moida-ovo.jpg", customizable:true, focus:"center 60%" },
-  { id:"calabresa", name:"Calabresa", category:"Cuscuz", price:10, description:"Calabresa dourada servida com cuscuz bem quentinho.", image:"/cuscuz-calabresa-limpo.png", customizable:true, focus:"center 63%" },
-  { id:"frango", name:"Frango com Catupiry", category:"Cuscuz", price:10, description:"Frango temperado com recheio cremoso e cuscuz macio.", image:"/cuscuz-frango-limpo.png", customizable:true, focus:"center 62%" },
-  { id:"queijo", name:"Queijo Coalho", category:"Cuscuz", price:9, description:"Cuscuz macio com queijo coalho derretido no recheio e douradinho por cima.", image:"/cuscuz-queijo-coalho-recheio-cobertura.jpg", customizable:true, badge:"Imagem ilustrativa", focus:"center" },
-  { id:"tap-carne-sol", name:"Carne de Sol, Requeijão e Queijo Coalho", category:"Tapioca", price:13, description:"Tapioca recheada com carne de sol, requeijão e queijo coalho.", image:"/tapioca-carne-sol-requeijao-queijo-coalho-limpo.png", customizable:true, badge:"Bem recheada", focus:"center 60%" },
-  { id:"tap-frango", name:"Frango com Catupiry", category:"Tapioca", price:10, description:"Frango temperado e recheio cremoso na tapioca.", image:"/tapioca-frango-limpo.png", customizable:true, focus:"center 62%" },
-  { id:"tap-queijo", name:"Queijo", category:"Tapioca", price:9, description:"Queijo derretido em uma tapioca leve e fresquinha.", image:"/tapioca.jpg", customizable:true, focus:"center 64%" },
-  { id:"tap-carne-moida", name:"Carne Moída", category:"Tapioca", price:10, description:"Carne moída bem temperada e recheio caprichado.", image:"/tapioca.jpg", customizable:true, focus:"center 64%" },
-  { id:"tap-calabresa", name:"Calabresa com Queijo", category:"Tapioca", price:10, description:"Calabresa dourada com queijo derretido.", image:"/tapioca.jpg", customizable:true, focus:"center 64%" },
-  { id:"tap-nutella", name:"Nutella com Morango", category:"Tapioca", price:12, description:"Creme de avelã e morango em uma tapioca docinha.", image:"/tapioca.jpg", badge:"Doce", focus:"center 64%" },
-  { id:"coca-250", name:"Coca-Cola Zero 250 ml", category:"Bebidas", price:3, description:"Garrafinha gelada, sem açúcar.", image:"/coca-zero-250.png", fit:"contain", badge:"Gelada" },
-  { id:"guarana-250", name:"Guaraná 250 ml", category:"Bebidas", price:3, description:"Guaraná gelado para acompanhar seu pedido.", image:"/guarana-250.png", fit:"contain", badge:"Gelado" },
-  { id:"coca-lata", name:"Coca-Cola Zero lata", category:"Bebidas", price:5, description:"Lata gelada, sem açúcar.", image:"/coca-zero-lata.png", fit:"contain", badge:"Gelada" },
-  { id:"sucos", name:"Sucos", category:"Bebidas", price:6, description:"Consulte os sabores disponíveis no WhatsApp.", image:"/suco.png", fit:"contain", badge:"Sabores do dia" },
-];
-
-const extras: Extra[] = [
-  { id:"queijo-extra", name:"Queijo", price:3 },
-  { id:"ovo-extra", name:"Ovo", price:2 },
-  { id:"manteiga-extra", name:"Manteiga extra", price:1.5 },
-];
-const categories: Category[] = ["Cuscuz", "Tapioca", "Bebidas"];
-const money = (value:number) => value.toLocaleString("pt-BR", { style:"currency", currency:"BRL" });
+import { products as baseProducts, extras, categories, money, type Product, type Extra, type CartItem, type Category } from "../lib/catalog";
 
 function WhatsAppIcon({ size = 22 }: { size?: number }) {
   return <svg className="whatsapp-icon" width={size} height={size} viewBox="0 0 24 24" aria-hidden="true"><path d={siWhatsapp.path}/></svg>;
@@ -56,6 +22,13 @@ function ArrowIcon() {
 }
 
 export function MenuApp() {
+  const [catalog,setCatalog] = useState<Record<string,{price:number;available:boolean}>>({});
+  const [defaultFee,setDefaultFee] = useState(0);
+  const [sending,setSending] = useState(false);
+  const [sendError,setSendError] = useState("");
+  const orderRequestId = useRef<string|null>(null);
+  const products = baseProducts.map(p=>({...p,price:catalog[p.id]?.price??p.price})).filter(p=>catalog[p.id]?.available!==false);
+  useEffect(()=>{const load=()=>fetch("/api/catalog",{cache:"no-store"}).then(r=>r.ok?r.json():null).then(b=>{if(b){setCatalog(b.products);setDefaultFee(b.defaultFee);}}).catch(()=>{});void load();window.addEventListener("focus",load);return()=>window.removeEventListener("focus",load);},[]);
   const [category,setCategory] = useState<Category>("Cuscuz");
   const [selected,setSelected] = useState<Product|null>(null);
   const [selectedExtras,setSelectedExtras] = useState<string[]>([]);
@@ -97,7 +70,7 @@ export function MenuApp() {
   const currentExtras = extras.filter(extra => selectedExtras.includes(extra.id));
   const currentTotal = selected ? (selected.price + currentExtras.reduce((sum,e)=>sum+e.price,0))*productQty : 0;
 
-  function choose(product:Product) { setSelected(product); setSelectedExtras([]); setProductQty(1); }
+  function choose(product:Product) { setSendError(""); orderRequestId.current=null; setSelected(product); setSelectedExtras([]); setProductQty(1); }
   function addSelected() {
     if (!selected) return;
     const productName = selected.name;
@@ -129,6 +102,7 @@ export function MenuApp() {
     }
     const chosen = selected.customizable ? currentExtras : [];
     const key = `${selected.id}-${chosen.map(e=>e.id).sort().join("-")}`;
+    orderRequestId.current=null;
     setCart(old => {
       const found = old.find(item => item.key === key);
       return found ? old.map(item => item.key === key ? {...item,quantity:item.quantity+productQty}:item) : [...old,{key,product:selected,extras:chosen,quantity:productQty}];
@@ -137,24 +111,22 @@ export function MenuApp() {
     window.setTimeout(() => setAddedProduct(null), 1800);
   }
   function changeQty(key:string, delta:number) {
+    orderRequestId.current=null;
     setCart(old => old.map(item => item.key === key ? {...item,quantity:item.quantity+delta}:item).filter(item=>item.quantity>0));
   }
-  function sendWhatsApp() {
-    const lines = ["Olá! Quero fazer este pedido:",""];
-    cart.forEach(item => {
-      const unit = item.product.price + item.extras.reduce((sum,e)=>sum+e.price,0);
-      lines.push(`${item.quantity}x ${item.product.name} — ${money(unit*item.quantity)}`);
-      if (item.extras.length) lines.push(`Adicionais: ${item.extras.map(e=>`${e.name} (+${money(e.price)})`).join(", ")}`);
-      lines.push("");
-    });
-    lines.push(`Subtotal: ${money(subtotal)}`,`Tipo do pedido: ${orderType}`);
-    if (orderType === "Entrega") lines.push("Taxa de entrega: a confirmar");
-    else lines.push("Retirada: Rua Senador Virgílio Távora, 781, Centro, Itarema - CE");
-    lines.push(`Total parcial: ${money(subtotal)}`,"",`Nome: ${name || "a informar"}`);
-    if (orderType === "Entrega") lines.push(`Endereço: ${address || "a informar"}`);
-    lines.push(`Forma de pagamento: ${payment || "a informar"}`);
-    if (notes) lines.push(`Observações: ${notes}`);
-    window.open(`https://wa.me/558897309179?text=${encodeURIComponent(lines.join("\n"))}`, "_blank", "noopener,noreferrer");
+  async function sendWhatsApp() {
+    if (sending) return;
+    if (!name.trim() || (orderType === "Entrega" && !address.trim())) { setSendError("Informe seu nome e o endereço para entrega."); return; }
+    setSending(true); setSendError("");
+    const popup=window.open("about:blank","_blank");
+    if(popup)popup.opener=null;
+    orderRequestId.current ||= crypto.randomUUID();
+    try {
+      const r=await fetch("/api/orders",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({requestId:orderRequestId.current,name,address,payment,notes,type:orderType,items:cart.map(i=>({productId:i.product.id,quantity:i.quantity,extras:i.extras.map(e=>e.id)}))})});
+      const b=await r.json();if(!r.ok)throw new Error(b.error||"Não foi possível registrar o pedido.");
+      if(popup)popup.location.href=b.whatsappUrl;else window.location.href=b.whatsappUrl;
+      setSendError(`Pedido #${b.code} registrado. Envie a mensagem no WhatsApp para confirmar com a Marmitinha.`);
+    }catch(e){popup?.close();setSendError((e as Error).message);}finally{setSending(false);}
   }
 
   return <main>
@@ -189,6 +161,7 @@ export function MenuApp() {
 
     {selected&&<div className="overlay" role="presentation" onMouseDown={()=>setSelected(null)}><section className="sheet product-sheet" role="dialog" aria-modal="true" aria-labelledby="product-title" onMouseDown={e=>e.stopPropagation()}><button className="close" onClick={()=>setSelected(null)} aria-label="Fechar">×</button><div className={`sheet-photo-wrap ${selected.fit === "contain" ? "contain" : ""}`}><img className="sheet-photo" src={selected.image} alt="" style={{objectPosition:selected.focus || "center",objectFit:selected.fit || "cover"}}/></div><div className="sheet-body"><p className="eyebrow">{selected.badge || selected.category}</p><h2 id="product-title">{selected.name}</h2><p className="sheet-description">{selected.description}</p><strong className="sheet-price">A partir de {money(selected.price)}</strong>{selected.customizable&&<fieldset className="extras"><legend>Quer acrescentar algo? <small>Opcional</small></legend>{extras.map(extra=><label key={extra.id}><input type="checkbox" checked={selectedExtras.includes(extra.id)} onChange={()=>setSelectedExtras(old=>old.includes(extra.id)?old.filter(id=>id!==extra.id):[...old,extra.id])}/><span>{extra.name}</span><strong>+ {money(extra.price)}</strong></label>)}</fieldset>}<div className="quantity"><span>Quantidade do item</span><div><button onClick={()=>setProductQty(q=>Math.max(1,q-1))} aria-label="Diminuir quantidade">−</button><strong>{productQty}</strong><button onClick={()=>setProductQty(q=>q+1)} aria-label="Aumentar quantidade">+</button></div></div><button className="primary-action" onClick={addSelected}>Adicionar ao pedido <span>{money(currentTotal)}</span></button></div></section></div>}
 
-    {cartOpen&&<div className="overlay" role="presentation" onMouseDown={()=>setCartOpen(false)}><aside className="sheet cart-sheet" role="dialog" aria-modal="true" aria-labelledby="cart-title" onMouseDown={e=>e.stopPropagation()}><div className="cart-head"><div><p className="eyebrow">Quase lá</p><h2 id="cart-title">Seu pedido</h2></div><button className="close static" onClick={()=>setCartOpen(false)} aria-label="Fechar pedido">×</button></div><div className="cart-scroll">{!cart.length?<div className="empty-cart"><span>◇</span><h3>Seu pedido está vazio</h3><p>Escolha um item do cardápio para começar.</p><button onClick={()=>setCartOpen(false)}>Voltar ao cardápio</button></div>:<><div className="cart-items">{cart.map(item=>{const unit=item.product.price+item.extras.reduce((s,e)=>s+e.price,0);return <article className="cart-item" key={item.key}><img src={item.product.image} alt="" style={{objectPosition:item.product.focus || "center",objectFit:item.product.fit || "cover"}}/><div><h3>{item.product.name}</h3>{item.extras.length>0&&<p>{item.extras.map(e=>e.name).join(", ")}</p>}<strong>{money(unit*item.quantity)}</strong><div className="cart-qty"><button onClick={()=>changeQty(item.key,-1)} aria-label={`Diminuir ${item.product.name}`}>−</button><span>{item.quantity}</span><button onClick={()=>changeQty(item.key,1)} aria-label={`Aumentar ${item.product.name}`}>+</button><button className="remove" onClick={()=>setCart(old=>old.filter(x=>x.key!==item.key))}>Remover</button></div></div></article>})}</div><div className="order-form"><h3>Como você quer receber?</h3><div className="type-toggle"><label><input type="radio" checked={orderType==="Entrega"} onChange={()=>setOrderType("Entrega")}/> Entrega</label><label><input type="radio" checked={orderType==="Retirada"} onChange={()=>setOrderType("Retirada")}/> Retirada</label></div>{orderType === "Retirada" && <div className="pickup-location"><strong>Local de retirada</strong><p>Rua Senador Virgílio Távora, 781<br/>Centro, Itarema – CE</p><a href="https://www.google.com/maps/dir/?api=1&destination=Rua%20Senador%20Virg%C3%ADlio%20T%C3%A1vora%2C%20781%2C%20Centro%2C%20Itarema%2C%20CE" target="_blank" rel="noopener noreferrer">Abrir rota no Google Maps ↗</a></div>}<label>Seu nome<input autoComplete="name" value={name} onChange={e=>setName(e.target.value)} placeholder="Como podemos chamar você?"/></label>{orderType==="Entrega"&&<label>Endereço<input autoComplete="street-address" value={address} onChange={e=>setAddress(e.target.value)} placeholder="Rua, número e bairro"/></label>}<label>Forma de pagamento<select value={payment} onChange={e=>setPayment(e.target.value)}><option value="">Escolha no WhatsApp</option><option>Pix</option><option>Dinheiro</option><option>Cartão</option></select></label><label>Observações<textarea value={notes} onChange={e=>setNotes(e.target.value)} placeholder="Ex.: sem cebola, troco para R$ 50..."/></label></div><div className="summary"><p><span>Subtotal</span><strong>{money(subtotal)}</strong></p><p><span>Entrega</span><strong>{orderType === "Entrega" ? "A confirmar" : "Sem taxa · retirada"}</strong></p><p className="total"><span>Total parcial</span><strong>{money(subtotal)}</strong></p><small>O pedido será confirmado após nosso atendimento responder.</small></div></>}</div>{cart.length>0&&<div className="cart-footer"><button className="whatsapp" onClick={sendWhatsApp}><WhatsAppIcon size={23}/> Enviar pedido pelo WhatsApp</button></div>}</aside></div>}
+    {cartOpen&&<div className="overlay" role="presentation" onMouseDown={()=>setCartOpen(false)}><aside className="sheet cart-sheet" role="dialog" aria-modal="true" aria-labelledby="cart-title" onMouseDown={e=>e.stopPropagation()}><div className="cart-head"><div><p className="eyebrow">Quase lá</p><h2 id="cart-title">Seu pedido</h2></div><button className="close static" onClick={()=>setCartOpen(false)} aria-label="Fechar pedido">×</button></div><div className="cart-scroll">{!cart.length?<div className="empty-cart"><span>◇</span><h3>Seu pedido está vazio</h3><p>Escolha um item do cardápio para começar.</p><button onClick={()=>setCartOpen(false)}>Voltar ao cardápio</button></div>:<><div className="cart-items">{cart.map(item=>{const unit=item.product.price+item.extras.reduce((s,e)=>s+e.price,0);return <article className="cart-item" key={item.key}><img src={item.product.image} alt="" style={{objectPosition:item.product.focus || "center",objectFit:item.product.fit || "cover"}}/><div><h3>{item.product.name}</h3>{item.extras.length>0&&<p>{item.extras.map(e=>e.name).join(", ")}</p>}<strong>{money(unit*item.quantity)}</strong><div className="cart-qty"><button onClick={()=>changeQty(item.key,-1)} aria-label={`Diminuir ${item.product.name}`}>−</button><span>{item.quantity}</span><button onClick={()=>changeQty(item.key,1)} aria-label={`Aumentar ${item.product.name}`}>+</button><button className="remove" onClick={()=>{orderRequestId.current=null;setCart(old=>old.filter(x=>x.key!==item.key));}}>Remover</button></div></div></article>})}</div><div className="order-form"><h3>Como você quer receber?</h3><div className="type-toggle"><label><input type="radio" checked={orderType==="Entrega"} onChange={()=>{orderRequestId.current=null;setOrderType("Entrega");}}/> Entrega</label><label><input type="radio" checked={orderType==="Retirada"} onChange={()=>{orderRequestId.current=null;setOrderType("Retirada");}}/> Retirada</label></div>{orderType === "Retirada" && <div className="pickup-location"><strong>Local de retirada</strong><p>Rua Senador Virgílio Távora, 781<br/>Centro, Itarema – CE</p><a href="https://www.google.com/maps/dir/?api=1&destination=Rua%20Senador%20Virg%C3%ADlio%20T%C3%A1vora%2C%20781%2C%20Centro%2C%20Itarema%2C%20CE" target="_blank" rel="noopener noreferrer">Abrir rota no Google Maps ↗</a></div>}<label>Seu nome<input autoComplete="name" value={name} onChange={e=>{orderRequestId.current=null;setName(e.target.value);}} placeholder="Como podemos chamar você?"/></label>{orderType==="Entrega"&&<label>Endereço<input autoComplete="street-address" value={address} onChange={e=>{orderRequestId.current=null;setAddress(e.target.value);}} placeholder="Rua, número e bairro"/></label>}<label>Forma de pagamento<select value={payment} onChange={e=>{orderRequestId.current=null;setPayment(e.target.value);}}><option value="">Escolha no WhatsApp</option><option>Pix</option><option>Dinheiro</option><option>Cartão</option></select></label><label>Observações<textarea value={notes} onChange={e=>{orderRequestId.current=null;setNotes(e.target.value);}} placeholder="Ex.: sem cebola, troco para R$ 50..."/></label></div><div className="summary"><p><span>Subtotal</span><strong>{money(subtotal)}</strong></p><p><span>Entrega</span><strong>{orderType === "Entrega" ? `${money(defaultFee)} · a confirmar` : "Sem taxa · retirada"}</strong></p><p className="total"><span>Total estimado</span><strong>{money(subtotal+(orderType==="Entrega"?defaultFee:0))}</strong></p><small>O pedido será confirmado após nosso atendimento responder.</small></div></>}</div>{cart.length>0&&<div className="cart-footer">{sendError&&<p role="status" style={{fontSize:13,lineHeight:1.5,margin:"0 0 12px"}}>{sendError}</p>}<button className="whatsapp" disabled={sending} onClick={sendWhatsApp}><WhatsAppIcon size={23}/> {sending?"Registrando pedido…":"Enviar pedido pelo WhatsApp"}</button></div>}</aside></div>}
   </main>;
 }
+
