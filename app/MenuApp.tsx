@@ -119,9 +119,9 @@ export function MenuApp() {
     if (!name.trim() || (orderType === "Entrega" && !address.trim())) { setSendError("Informe seu nome e o endereço para entrega."); return; }
     setSending(true); setSendError("");
 
-    orderRequestId.current ||= crypto.randomUUID();
+    orderRequestId.current ||= globalThis.crypto?.randomUUID?.() || `pedido-${Date.now()}-${Math.random().toString(36).slice(2,14)}`;
     try {
-      const r=await fetch("/api/orders",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({requestId:orderRequestId.current,name,address,payment,notes,type:orderType,items:cart.map(i=>({productId:i.product.id,quantity:i.quantity,extras:i.extras.map(e=>e.id)}))})});
+      const r=await fetch("/api/orders",{signal:AbortSignal.timeout(5000),method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({requestId:orderRequestId.current,name,address,payment,notes,type:orderType,items:cart.map(i=>({productId:i.product.id,quantity:i.quantity,extras:i.extras.map(e=>e.id)}))})});
       const b=await r.json();if(!r.ok)throw new Error(b.error||"Não foi possível registrar o pedido.");
       window.location.assign(b.whatsappUrl);
       setSendError(`Pedido #${b.code} registrado. Envie a mensagem no WhatsApp para confirmar com a Marmitinha.`);
