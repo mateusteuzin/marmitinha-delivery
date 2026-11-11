@@ -7,6 +7,16 @@ import ManualSale from "./ManualSale";
 type Tab="pedidos"|"cardapio"|"resumo";
 function Icon({name,size=24}:{name:string;size?:number}){const paths:Record<string,string>={bag:"M5 7h14l1 14H4L5 7Zm4 1V5a3 3 0 0 1 6 0v3",menu:"M7 4h10v17H7V4Zm3 4h4m-4 4h4m-4 4h4",chart:"M5 20V12m7 8V4m7 16V8",food:"M4 15h16M6 14a6 6 0 0 1 12 0M3 19h18M12 5V3",truck:"M2 5h12v12H2V5Zm12 5h4l4 4v3h-8M7 19a2 2 0 1 0 0-4 2 2 0 0 0 0 4Zm11 0a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z",coin:"M20 6c0 2-16 2-16 0s16-2 16 0Zm-16 0v12c0 3 16 3 16 0V6M4 12c0 3 16 3 16 0",calendar:"M4 5h16v16H4V5Zm3-3v6m10-6v6M4 11h16",check:"m5 12 4 4L19 6",arrow:"m9 5 7 7-7 7",back:"m15 5-7 7 7 7",edit:"m4 16 11-11 4 4L8 20H4v-4Zm9-9 4 4",search:"M16 16l5 5M18 10a8 8 0 1 0-16 0 8 8 0 0 0 16 0",user:"M5 21v-3a7 7 0 0 1 14 0v3M16 6a4 4 0 1 1-8 0 4 4 0 0 1 8 0",store:"M4 9v12h16V9M3 9l2-6h14l2 6M3 9c0 4 5 4 6 0 0 4 6 4 6 0 1 4 6 4 6 0",card:"M3 5h18v15H3V5Zm0 5h18M7 16h3",trophy:"M8 3h8v8a4 4 0 0 1-8 0V3Zm0 2H3v3a5 5 0 0 0 5 5m8-8h5v3a5 5 0 0 1-5 5m-4 2v6m-4 0h8",alert:"M12 7v6m0 4v.1M22 12a10 10 0 1 1-20 0 10 10 0 0 1 20 0"};return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d={paths[name]||paths.food}/></svg>;}
 const today=()=>dayKey(new Date().toISOString());
+const pickupAddress="Rua Senador Virgílio Távora, 1000, Itarema - CE";
+function deliveryAddress(address:string){
+ const value=address.trim();
+ return /\bitarema\b/i.test(value)?value:`${value}, Itarema - CE`;
+}
+function deliveryRoute(address:string){
+ return "https://www.google.com/maps/dir/?"+new URLSearchParams({
+  api:"1",origin:pickupAddress,destination:deliveryAddress(address),travelmode:"driving"
+ }).toString();
+}
 export default function AdminApp({initialTab="pedidos"}:{initialTab?:Tab}){
  const [manual,setManual]=useState(false);
  const [auth,setAuth]=useState<boolean|null>(null),[password,setPassword]=useState("");
@@ -38,7 +48,11 @@ export default function AdminApp({initialTab="pedidos"}:{initialTab?:Tab}){
  <button className="adm-back" onClick={()=>setEditing(null)}><Icon name="back"/> Voltar aos pedidos</button><h1>Pedido #{editing.code}</h1><p className="adm-order-sub">{editing.name} · <span className={`adm-badge ${editing.status}`}>{editing.status==="pending"?"A conferir":editing.status==="completed"?"Concluído":"Cancelado"}</span></p>
  <div className="adm-detail-layout"><div><section className="adm-panel adm-lines">{editing.lines.map((l,i)=><div className="adm-line" key={i}><div><strong>{l.name}</strong>{l.extras.length>0&&<small>{l.extras.join(", ")}</small>}</div><label>Qtd.<input type="number" min="1" max="99" step="1" value={l.quantity} onChange={e=>patchLine(i,"quantity",e.target.valueAsNumber)}/></label><label>Preço unitário<input type="number" min="0" max="10000" step="0.01" value={Number.isNaN(l.unitPrice)?"":l.unitPrice} onChange={e=>patchLine(i,"unitPrice",e.target.valueAsNumber)}/></label></div>)}</section>
  <div className="adm-type">{(["Entrega","Retirada"] as const).map(t=><button key={t} aria-pressed={editing.type===t} className={editing.type===t?"active":""} onClick={()=>setEditing({...editing,type:t,fee:t==="Retirada"?0:(settings?.defaultFee||0)})}><Icon name={t==="Entrega"?"truck":"bag"}/>{t}<span>{editing.type===t?"◉":"○"}</span></button>)}</div>
- <div className="adm-address">{editing.type==="Entrega"?editing.address:"Rua Senador Virgílio Távora, 1000 · Itarema–CE"}</div>
+ <div className="adm-address">{editing.type==="Entrega"?<>
+ <strong>Endereço de entrega</strong>
+ <p style={{margin:"8px 0",overflowWrap:"anywhere"}}>{editing.address.trim()?deliveryAddress(editing.address):"Endereço não informado"}</p>
+ {editing.address.trim()&&<a className="adm-secondary" style={{marginTop:12,textDecoration:"none",boxSizing:"border-box"}} href={deliveryRoute(editing.address)} target="_blank" rel="noopener noreferrer"><Icon name="truck" size={20}/> Ver rota no Google Maps ↗</a>}
+ </>:pickupAddress}</div>
  {editing.type==="Entrega"&&<label className="adm-inline-field">Frete <span>R$ <input aria-label="Valor do frete" type="number" min="0" max="10000" step="0.01" value={Number.isNaN(editing.fee)?"":editing.fee} onChange={e=>setEditing({...editing,fee:e.target.valueAsNumber})}/></span></label>}
  {editing.notes&&<p className="adm-panel">Observações: {editing.notes}</p>}</div>
  <div className="adm-detail-summary"><div className="adm-row"><span>Subtotal (produtos)</span><strong>{money(editing.lines.reduce((v,l)=>v+l.quantity*l.unitPrice,0))}</strong></div><div className="adm-total"><strong>Total</strong><strong>{money(total(editing))}</strong></div><label className="adm-payment">Pagamento<select value={editing.payment} onChange={e=>setEditing({...editing,payment:e.target.value})}>{["A informar","Pix","Dinheiro","Cartão"].map(p=><option key={p}>{p}</option>)}</select></label><button disabled={busy||editing.status==="completed"} className="adm-primary" onClick={()=>void save({action:"order",order:{...editing,status:"completed"}})}>Salvar e concluir</button><button disabled={busy} className="adm-secondary" onClick={()=>void save({action:"order",order:editing})}>Salvar alterações</button>{editing.status!=="cancelled"?<button disabled={busy} className="adm-danger" onClick={()=>{if(window.confirm(`Cancelar pedido #${editing.code}? Ele não contará nas vendas.`))void save({action:"order",order:{...editing,status:"cancelled"}});}}>Cancelar pedido</button>:<button className="adm-secondary" disabled={busy} onClick={()=>void save({action:"order",order:{...editing,status:"pending"}})}>Reabrir para conferência</button>}</div></div></>:tab==="pedidos"?<>
