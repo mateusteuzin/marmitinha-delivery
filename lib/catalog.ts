@@ -35,3 +35,9 @@ export const categories: Category[] = ["Cuscuz", "Tapioca", "Bebidas"];
 export const money = (value:number) => value.toLocaleString("pt-BR", { style:"currency", currency:"BRL" });
 
 
+
+// Include the food category wherever an item must be identified outside its menu tab.
+export function orderItemName(name:string,category?:Category){
+ if(!category||category==="Bebidas"||name.toLocaleLowerCase("pt-BR").startsWith(category.toLocaleLowerCase("pt-BR")))return name;
+ return `${category} — ${name}`;
+}
